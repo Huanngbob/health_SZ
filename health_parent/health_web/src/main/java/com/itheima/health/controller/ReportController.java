@@ -1,6 +1,7 @@
 package com.itheima.health.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.itheima.health.Utils.MonthUtils;
 import com.itheima.health.constant.MessageConstant;
 import com.itheima.health.entity.Result;
 import com.itheima.health.service.MemberService;
@@ -48,36 +49,17 @@ public class ReportController {
      * @return
      */
     @GetMapping("/getMemberReport")
-    public Result getMemberReport(){
-        // 产生12个月的数据, 2020-01
-        List<String> months = new ArrayList<String>();
-        // 使用日历
-        Calendar car = Calendar.getInstance();
-        // 过去一年, 年-1
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
-        car.add(Calendar.YEAR, -1);
-        // 遍历12次，依次加1个月
-        for (int i = 0; i < 12; i++) {
-            // +1个月
-            car.add(Calendar.MONTH,1);
-            months.add(sdf.format(car.getTime()));
-        }
+    public Result getMemberReport(String[] value) throws Exception {
 
-        // 调用服务去查询12个月的数据
-        List<Integer> memberCount = memberService.getMemberReport(months);
+
+        List<String> months = new ArrayList<>();
+
+        List<String> queryMonths = MonthUtils.getQueryMonths(value);
+
+        List<Integer> memberCount = memberService.getMemberReport(queryMonths);
         // 构建返回的数据
-        /**
-         * {
-         *     flag
-         *     message:
-         *     data:{
-         *         months:
-         *         memberCount:
-         *     }
-         * }
-         */
         Map<String,Object> resultMap = new HashMap<String,Object>();
-        resultMap.put("months",months);
+        resultMap.put("months",queryMonths);
         resultMap.put("memberCount",memberCount);
         return new Result(true, MessageConstant.GET_MEMBER_NUMBER_REPORT_SUCCESS,resultMap);
     }

@@ -11,6 +11,10 @@
     <!-- 引入样式 -->
     <link rel="stylesheet" href="../css/style.css">
     <script src="../js/echarts.js"></script>
+    <script src="//unpkg.com/vue/dist/vue.js"></script>
+    <script src="//unpkg.com/element-ui@2.14.0/lib/index.js"></script>
+
+    <link rel="stylesheet" href="../plugins/elementui/index.css">
 </head>
 <body class="hold-transition">
 <div id="app">
@@ -22,6 +26,23 @@
             <el-breadcrumb-item>会员数量</el-breadcrumb-item>
         </el-breadcrumb>
     </div>
+    <hr>
+
+    <template>
+        <div class="block">
+            <span class="demonstration">请选择时间段</span>
+            <el-date-picker
+                    v-model="value1"
+                    type="monthrange"
+                    range-separator="至"
+                    start-placeholder="开始月份"
+                    end-placeholder="结束月份">
+            </el-date-picker>
+            <el-button @click="query()">确认</el-button>
+        </div>
+
+    </template>
+
     <div class="app-container">
         <div class="box">
             <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
@@ -31,36 +52,54 @@
 </div>
 </body>
 <!-- 引入组件库 -->
-<script src="../js/vue.js"></script>
+<!--<script src="../js/vue.js"></script>-->
 <script src="../js/axios-0.18.0.js"></script>
-<script type="text/javascript">
-    // 基于准备好的dom，初始化echarts实例
-    var myChart1 = echarts.init(document.getElementById('chart1'));
+<script type="application/javascript">
+    var vue = new Vue({
+        el: "#app",
+        data: {
+            value1: ' '
+        },
+        /*created() {
+            this.value1=["Wed Jan 01 2020 00:00:00 GMT 0800 (中国标准时间)","Fri Oct 01 2021 00:00:00 GMT 0800 (中国标准时间)"];
+            this.query();
+        },*/
+        methods: {
+            query() {
+                // 基于准备好的dom，初始化echarts实例
+                var myChart1 = echarts.init(document.getElementById("chart1"));
 
-    // 使用刚指定的配置项和数据显示图表。
-    //myChart.setOption(option);
 
-    axios.get("/report/getMemberReport.do").then((res) => {
-        myChart1.setOption({
-            title: {
-                text: '会员数量'
-            },
-            tooltip: {},
-            legend: {
-                data: ['会员数量']
-            },
-            xAxis: {
-                data: res.data.data.months
-            },
-            yAxis: {
-                type: 'value'
-            },
-            series: [{
-                name: '会员数量',
-                type: 'line',
-                data: res.data.data.memberCount
-            }]
-        });
-    });
+                // 使用刚指定的配置项和数据显示图表。
+                //myChart.setOption(option);
+
+                axios.get("/report/getMemberReport.do?value=" + this.value1).then((res) => {
+                    myChart1.setOption({
+                        title: {
+                            text: '会员数量'
+                        },
+                        tooltip: {},
+                        legend: {
+                            data: ['会员数量']
+                        },
+                        xAxis: {
+                            data: res.data.data.months
+                        },
+                        yAxis: {
+                            type: 'value'
+                        },
+                        series: [{
+                            name: '会员数量',
+                            type: 'line',
+                            data: res.data.data.memberCount
+                        }]
+                    });
+                });
+            }
+        },
+
+
+    })
+
 </script>
 </html>
